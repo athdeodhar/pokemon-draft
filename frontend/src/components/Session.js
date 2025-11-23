@@ -66,9 +66,21 @@ function Session() {
   }, [sessionId, navigate, username, userId]);
 
   const copySessionId = () => {
-    navigator.clipboard.writeText(sessionId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(sessionId)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy session ID:', err);
+          // Fallback: select the session ID text
+          alert(`Session ID: ${sessionId}`);
+        });
+    } else {
+      // Fallback for browsers that don't support clipboard API
+      alert(`Session ID: ${sessionId}`);
+    }
   };
 
   const handleLeaveSession = () => {
